@@ -32,5 +32,40 @@ namespace projekatKVA.Controllers
 
             return itemDTO;
         }
+
+        [HttpGet]
+        public async Task<ActionResult<ItemDTO>> GetFilterItem(string? manufacturer, string? size, string? type, double? price)
+        {
+            IQueryable<Item> query = _dbContext.Items;
+
+            // Primena filtera na osnovu opcionalnih parametara
+            if (manufacturer != null)
+            {
+                query = query.Where(x => x.Manufacturer == manufacturer);
+            }
+            if (size != null)
+            {
+                query = query.Where(x => x.Size == size);
+            }
+            if (type != null)
+            {
+                query = query.Where(x => x.Type == type);
+            }
+            if (price != null)
+            {
+                query = query.Where(x => x.Price <= price);
+            }
+
+            var item = await query.FirstOrDefaultAsync();
+
+            if (item == null)
+            {
+                return NotFound();
+            }
+
+            var itemDTO = _mapper.Map<ItemDTO>(item);
+
+            return Ok(itemDTO);
+        }
     }
 }
