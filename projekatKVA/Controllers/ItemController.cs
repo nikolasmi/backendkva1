@@ -34,7 +34,7 @@ namespace projekatKVA.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<ItemDTO>> GetFilterItem(string? manufacturer, string? size, string? type, double? price)
+        public async Task<ActionResult<List<ItemDTO>>> GetFilterItem(string? manufacturer, string? size, string? type, double? price)
         {
             IQueryable<Item> query = _dbContext.Items;
 
@@ -56,16 +56,17 @@ namespace projekatKVA.Controllers
                 query = query.Where(x => x.Price <= price);
             }
 
-            var item = await query.FirstOrDefaultAsync();
+            var items = await query.ToListAsync();
 
-            if (item == null)
+            if (items.Count == 0)
             {
                 return NotFound();
             }
 
-            var itemDTO = _mapper.Map<ItemDTO>(item);
+            var itemDTOs = _mapper.Map<List<ItemDTO>>(items);
 
-            return Ok(itemDTO);
+            return Ok(itemDTOs);
         }
+
     }
 }

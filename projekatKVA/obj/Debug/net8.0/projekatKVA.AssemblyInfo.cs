@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("projekatKVA")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+93d475d9b50438f8cf6f19bffcac5a361ed77bb2")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0a8fd020d6223b1a01b4150e39071c7930bd9a0d")]
 [assembly: System.Reflection.AssemblyProductAttribute("projekatKVA")]
 [assembly: System.Reflection.AssemblyTitleAttribute("projekatKVA")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
