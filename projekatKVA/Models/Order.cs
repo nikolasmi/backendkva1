@@ -15,7 +15,11 @@ public partial class Order
 
     public double Rating { get; set; }
 
+    public DateOnly OrderDate { get; set; }
+
     public virtual Item Item { get; set; } = null!;
+
+    public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 
     public virtual User User { get; set; } = null!;
 }

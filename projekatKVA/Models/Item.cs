@@ -21,5 +21,11 @@ public partial class Item
 
     public string? PicturePath { get; set; }
 
+    public virtual ICollection<Cart> Carts { get; set; } = new List<Cart>();
+
+    public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
+
+    public virtual ICollection<Wish> Wishes { get; set; } = new List<Wish>();
 }
