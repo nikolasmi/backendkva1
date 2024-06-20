@@ -17,5 +17,9 @@ namespace projekatKVA.DTOs
         public virtual Item Item { get; set; } = null!;
 
         public virtual User User { get; set; } = null!;
+
+        public DateOnly OrderDate { get; set; }
+
+        public List<OrderItem> OrderItems { get; set; }
     }
 }

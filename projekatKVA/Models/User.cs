@@ -21,7 +21,11 @@ public partial class User
 
     public string Password { get; set; } = null!;
 
-    public int FavouriteItems { get; set; }
+    public int FavouriteItems { get; set; } = 0;
+
+    public virtual ICollection<Cart> Carts { get; set; } = new List<Cart>();
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
+
+    public virtual ICollection<Wish> Wishes { get; set; } = new List<Wish>();
 }

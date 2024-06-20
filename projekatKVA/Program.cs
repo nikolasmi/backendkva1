@@ -8,13 +8,17 @@ using projekatKVA.Models;
 using projekatKVA.Services;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+using Microsoft.AspNetCore.Cors.Infrastructure;
+using projekatKVA.Controllers;
+using static projekatKVA.Controllers.CartController;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 var MyAllowSpecificOrigins = "http://localhost:5173";
-
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddDbContext<ShopContext>();
@@ -26,46 +30,39 @@ builder.Services.AddSwaggerGen(options =>
         In = Microsoft.OpenApi.Models.ParameterLocation.Header,
         Name = "Authorization",
         Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey
-    }); 
+    });
 
     options.OperationFilter<SecurityRequirementsOperationFilter>();
 });
+//builder.Services.AddSwaggerGen();
+
 
 builder.Services.AddScoped<IUserService, UserService>();
 
-//JWT
-var key = Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"]);
-builder.Services.AddAuthentication(x =>
-{
-    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-    .AddCookie(x =>
-    {
-        x.Cookie.Name = "token";
-    })
-    .AddJwtBearer(x =>
-    {
-        x.RequireHttpsMetadata = false;
-        x.SaveToken = true;
-        x.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(key),
-            ValidateIssuer = false,
-            ValidateAudience = false,
-        };
-        x.Events = new JwtBearerEvents
-        {
 
-            OnMessageReceived = context =>
-            {
-                context.Token = context.Request.Cookies["token"];
-                return Task.CompletedTask;
-            }
-        };
-    });
+var key = builder.Configuration["Jwt:Key"];
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.RequireHttpsMetadata = false;
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = "https://localhost:7062/",
+        ValidAudience = "https://localhost:7062/",
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"]))
+    };
+});
 builder.Services.AddAuthorization();
+
 
 builder.Services.AddCors(options =>
 {

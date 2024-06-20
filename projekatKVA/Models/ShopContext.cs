@@ -15,11 +15,17 @@ public partial class ShopContext : DbContext
     {
     }
 
+    public virtual DbSet<Cart> Carts { get; set; }
+
     public virtual DbSet<Item> Items { get; set; }
 
     public virtual DbSet<Order> Orders { get; set; }
 
+    public virtual DbSet<OrderItem> OrderItems { get; set; }
+
     public virtual DbSet<User> Users { get; set; }
+
+    public virtual DbSet<Wish> Wishes { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
@@ -27,6 +33,26 @@ public partial class ShopContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Cart>(entity =>
+        {
+            entity.ToTable("cart");
+
+            entity.Property(e => e.CartId).HasColumnName("cart_id");
+            entity.Property(e => e.ItemId).HasColumnName("item_id");
+            entity.Property(e => e.Quantity).HasColumnName("quantity");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+
+            entity.HasOne(d => d.Item).WithMany(p => p.Carts)
+                .HasForeignKey(d => d.ItemId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_cart_item");
+
+            entity.HasOne(d => d.User).WithMany(p => p.Carts)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_cart_user");
+        });
+
         modelBuilder.Entity<Item>(entity =>
         {
             entity.ToTable("item");
@@ -57,6 +83,7 @@ public partial class ShopContext : DbContext
 
             entity.Property(e => e.OrderId).HasColumnName("order_id");
             entity.Property(e => e.ItemId).HasColumnName("item_id");
+            entity.Property(e => e.OrderDate).HasColumnName("orderDate");
             entity.Property(e => e.Rating).HasColumnName("rating");
             entity.Property(e => e.Status)
                 .HasMaxLength(50)
@@ -72,6 +99,24 @@ public partial class ShopContext : DbContext
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_order_user");
+        });
+
+        modelBuilder.Entity<OrderItem>(entity =>
+        {
+            entity.ToTable("OrderItem");
+
+            entity.Property(e => e.OrderItemId).HasColumnName("orderItemId");
+            entity.Property(e => e.ItemName).HasMaxLength(50);
+
+            entity.HasOne(d => d.Item).WithMany(p => p.OrderItems)
+                .HasForeignKey(d => d.ItemId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_OrderItem_item");
+
+            entity.HasOne(d => d.Order).WithMany(p => p.OrderItems)
+                .HasForeignKey(d => d.OrderId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_OrderItem_order");
         });
 
         modelBuilder.Entity<User>(entity =>
@@ -108,6 +153,25 @@ public partial class ShopContext : DbContext
                 .HasMaxLength(250)
                 .IsUnicode(false)
                 .HasColumnName("username");
+        });
+
+        modelBuilder.Entity<Wish>(entity =>
+        {
+            entity.ToTable("wish");
+
+            entity.Property(e => e.WishId).HasColumnName("wish_id");
+            entity.Property(e => e.ItemId).HasColumnName("item_id");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+
+            entity.HasOne(d => d.Item).WithMany(p => p.Wishes)
+                .HasForeignKey(d => d.ItemId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_wish_item");
+
+            entity.HasOne(d => d.User).WithMany(p => p.Wishes)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_wish_user");
         });
 
         OnModelCreatingPartial(modelBuilder);

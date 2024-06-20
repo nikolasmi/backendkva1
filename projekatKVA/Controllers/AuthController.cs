@@ -47,19 +47,25 @@ namespace projekatKVA.Controllers
         [AllowAnonymous]
         public IActionResult Login(LoginModel model)
         {
+
+            IActionResult response = Unauthorized();
             var token = _userService.Login(model);
             if (token == null || token == string.Empty)
             {
                 return BadRequest(new { message = "UserName or Password is incorrect" });
             }
 
-            HttpContext.Response.Cookies.Append("token", token, new CookieOptions
-            {
-                Expires = DateTime.Now.AddMinutes(30)
-            });
             return Ok(token);
 
+
+            //HttpContext.Response.Cookies.Append("token", token, new CookieOptions
+            //{
+            //    Expires = DateTime.Now.AddMinutes(30)
+            //});
+
         }
+
+
 
     }
 }

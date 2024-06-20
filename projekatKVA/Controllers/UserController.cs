@@ -43,6 +43,41 @@ namespace projekatKVA.Controllers
             return Ok(user);
         }
 
+        [HttpPost]
+        public async Task<ActionResult<UserDTO>> AddOrUpdateUser([FromBody] UserDTO dto)
+        {
+            try
+            {
+                // Provera da li korisnik već postoji u bazi
+                var existingUser = await _dbContext.Users.FirstOrDefaultAsync(u => u.Username == dto.Username || u.Email == dto.Email);
+
+                if (existingUser != null)
+                {
+                    // Ažuriranje postojećeg korisnika
+                    _mapper.Map(dto, existingUser); // Ako koristite AutoMapper za mapiranje podataka
+                    _dbContext.Users.Update(existingUser);
+                    await _dbContext.SaveChangesAsync();
+
+                    var updatedUserDTO = _mapper.Map<UserDTO>(existingUser);
+                    return Ok(updatedUserDTO);
+                }
+                else
+                {
+                    // Dodavanje novog korisnika
+                    var newUser = _mapper.Map<User>(dto);
+                    await _dbContext.Users.AddAsync(newUser);
+                    await _dbContext.SaveChangesAsync();
+
+                    var newUserDTO = _mapper.Map<UserDTO>(newUser);
+                    return Ok(newUserDTO);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Greška prilikom dodavanja/ažuriranja korisnika: {ex.Message}");
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
 
     }
 }
